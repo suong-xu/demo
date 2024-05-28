@@ -20,8 +20,8 @@ class CartController extends Controller
             $is_availble=0;
             foreach($cart as $key=> $val){
                 if($val['product_id']==$data['cart_product_id']){
-                    $is_availble++;                  
-                    $cart[$key]['product_qty']+=1;                  
+                    $is_availble++;
+                    $cart[$key]['product_qty']+=1;
                 }
                 }
                 if($is_availble==0)
@@ -37,7 +37,7 @@ class CartController extends Controller
                             'product_size'=>$data['cart_product_size'],
                         );
                     }
-                    Session()->put('cart',$cart);          
+                    Session()->put('cart',$cart);
         }else{
                 $cart[]=array(
                     'session_id'=> $session_id,
@@ -47,20 +47,20 @@ class CartController extends Controller
                     'product_qty'=>$data['cart_product_qty'],
                     'product_price'=>$data['cart_product_price'],
                     'product_tong'=>$data['cart_product_quantity'],
-                    'product_size'=>$data['cart_product_size'],                   
+                    'product_size'=>$data['cart_product_size'],
                 );
             }
             Session()->put('cart',$cart);
-            session()->save();          
+            session()->save();
     }
     public function show_cart_ajax(Request $request){
         $cate_product=DB::table('tbl_category_product')->where('category_status','0')->orderBy('category_id','desc')->get();
-        $brand_product=DB::table('tbl_brand_product')->where('brand_status','0')->orderBy('brand_id','desc')->get(); 
+        $brand_product=DB::table('tbl_brand_product')->where('brand_status','0')->orderBy('brand_id','desc')->get();
             $meta_desc= 'Giỏ hàng ajxax';
             $meta_keywords = 'Giỏ hàng shop Mrdũng';
             $meta_title = 'Giỏ hàng ajxax';
             $url_canonnial=$request->url();
-        
+
         return view('pages.cart.cart_ajax')->with('categorys',$cate_product)->with('brands',$brand_product)->with('meta_desc',$meta_desc)
         ->with('meta_keywords',$meta_keywords)->with('meta_title',$meta_title)->with('url_canonnial',$url_canonnial);
     }
@@ -79,7 +79,7 @@ class CartController extends Controller
     }
 
     public function update_cart(Request $request){
-       
+
         $data=$request->all();
         $cart=session()->get('cart');
         if($cart==true){
@@ -105,5 +105,5 @@ class CartController extends Controller
         }
 
     }
-    
+
 }

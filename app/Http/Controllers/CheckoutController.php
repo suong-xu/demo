@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -25,14 +26,14 @@ class CheckoutController extends Controller
     public function login_checkout(Request $request){
         $cate_product=DB::table('tbl_category_product')->where('category_status','0')->orderBy('category_id','desc')->get();
         $brand_product=DB::table('tbl_brand_product')->where('brand_status','0')->orderBy('brand_id','desc')->get();
-        
+
         $meta_desc= 'Login_checkout';
         $meta_keywords = 'Login_checkout shop Mrdũng';
         $meta_title = 'Login_checkout';
         $url_canonnial=$request->url();
         return view('pages.checkout.login_checkout')->with('categorys',$cate_product)->with('brands',$brand_product)
      ->with('meta_desc',$meta_desc)->with('meta_keywords',$meta_keywords)->with('meta_title',$meta_title)->with('url_canonnial',$url_canonnial);
-    }       
+    }
 
 
     public function add_customer(Request $request){
@@ -49,17 +50,18 @@ class CheckoutController extends Controller
         return Redirect::to('/checkout');
     }
     public function checkout(Request $request){
+        $customer = session()->get('customer_information');
         $cate_product=DB::table('tbl_category_product')->where('category_status','0')->orderBy('category_id','desc')->get();
         $brand_product=DB::table('tbl_brand_product')->where('brand_status','0')->orderBy('brand_id','desc')->get();
         $meta_desc= 'Checkout';
         $meta_keywords = 'Checkout shop Mrdũng';
         $meta_title = 'Checkout';
         $url_canonnial=$request->url();
-        return view('pages.checkout.checkout')->with('categorys',$cate_product)->with('brands',$brand_product)
+        return view('pages.checkout.checkout', compact('customer'))->with('categorys',$cate_product)->with('brands',$brand_product)
         ->with('meta_desc',$meta_desc)->with('meta_keywords',$meta_keywords)->with('meta_title',$meta_title)->with('url_canonnial',$url_canonnial);
     }
 
-   
+
     public function order(Request $request){
         $data=$request->all();
         $shipping = new Shipping();
@@ -71,7 +73,7 @@ class CheckoutController extends Controller
         $shipping->payment_method= $data['payment_method'];
         $shipping->save();
         $shipping_id=$shipping->shipping_id;
-        
+
         $checkout_code=substr(md5(microtime()),rand(0,24),5);
 
         $order= new Order();
@@ -80,23 +82,23 @@ class CheckoutController extends Controller
         $order->order_status=1;
         $order->order_code=$checkout_code;
         date_default_timezone_set('Asia/Ho_Chi_Minh');
-        $order->created_at=now();        
-        $order->save();  
+        $order->created_at=now();
+        $order->save();
         if(session()->get('cart')==true){
-            foreach(session()->get('cart') as $key =>$cart){ 
+            foreach(session()->get('cart') as $key =>$cart){
                     $order_detail= new OrderDetail();
                     $order_detail->order_code=$checkout_code;
                     $order_detail->product_id=$cart["product_id"];
                     $order_detail->product_name=$cart["product_name"];
                     $order_detail->product_price=$cart["product_price"];
                     $order_detail->product_sales_qty=$cart["product_qty"];
-                    $order_detail->product_size=$cart["product_size"]; 
+                    $order_detail->product_size=$cart["product_size"];
                     $order_detail->save();
             }
         }
         Session()->forget('cart');
     }
-     
+
     public function logout_checkout(){
         Session()->flush();
         return Redirect::to('/login-checkout');
@@ -110,18 +112,19 @@ class CheckoutController extends Controller
         $passworddt=$result->customer_password;
         $emaildt=$result->customer_email;
         if($email==$emaildt){
-            if(password_verify($password,$passworddt)){ 
+            if(password_verify($password,$passworddt)){
                 $request->session()->put('customer_id',$result->customer_id);
+                $request->session()->put('customer_information', $result);
                 return Redirect('/checkout');
             }
             else{
                 Session()->put('message','Tên tài khoản hoặc mật khẩu sai!');
                 return Redirect::to('/login-checkout');
-    
-            }      
+
+            }
         }else{
             Session()->put('message','Tên tài khoản hoặc mật khẩu sai!');
             return Redirect::to('/login-checkout');
         }
-    }  
+    }
 }

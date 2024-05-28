@@ -95,6 +95,8 @@ Route::post('/checkout', [PaymentController::class, 'checkout'])->name('checkout
 Route::get('/blog',[BlogController::class,'blog']);
 Route::get('/contact',[ContactController::class,'contact']);
 Route::get('/contract',[ContractController::class,'contact']);
+Route::get('/payment-details/{id}', [BlogController::class, 'getPaymentDetails']);
+
 
 
 

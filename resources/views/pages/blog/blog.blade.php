@@ -12,7 +12,7 @@
         <div class="col-xl-12 col-md-12 col-lg-12 pt-3">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="page-title">Lịch sử thanh toán</h3>
+                    <h3 class="page-title">Lịch sử thanh toán123</h3>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
